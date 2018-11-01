@@ -4,20 +4,17 @@
 namespace eosio {
 
 
-   void profile::hi( account_name user ) {
-      print( "Hello, ", name{user} );
-   }
-
-
-   void profile::blacklistadd( account_name account ) {
+   void profile::blacklistadd( account_name account, asset token_min ) {
       require_auth( _self );
+
+      print(token_min, "\n");
 
       eosio_assert( _blacklist.find( account ) == _blacklist.end(),
                    " account alreaded blacklisted" );
 
-      _blacklist.emplace( _self, [&](auto& bl) {
-         bl.account = account;
-      });
+      // _blacklist.emplace( _self, [&](auto& bl) {
+      //    bl.account = account;
+      // });
    }
 
 

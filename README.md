@@ -13,7 +13,7 @@ Features
   - catch 'transfer' action and check my balance against my lock before sending
 
 Tables
-## blacklist
+### blacklist
 ```bash
 cleos get table timmy timmy blacklist
 
@@ -29,6 +29,19 @@ cleos get table timmy timmy blacklist
 
 
 Actions
-## blacklistadd
+### blacklistadd
+Blocks an account from sending you less than any specified token.  This can be commonly used to prevent spam token transfers.
+
+Inputs:
+"name": Account to blacklist
+"amount": Smallest amount of tokens you allow to be sent to you by the sender.  If zero '0.0000' then block all amounts
+
+ex: block all token transfers from "evilman" that are under "5.0000 EOS"
+```bash
+cleos push action timmy blacklistadd '["evilman","5.0000 EOS"]' -p timmy@active
+```
 
 ## blacklistrm
+```bash
+cleos push action timmy blacklistrm '["bestfriend"]' -p timmy@active
+```

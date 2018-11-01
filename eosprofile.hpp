@@ -2,6 +2,8 @@
 #include <eosiolib/action.hpp>
 #include <eosiolib/asset.hpp>
 
+#include <set>
+
 #define EOS_SYMBOL S(4,EOS)
 
 namespace eosio {
@@ -30,11 +32,9 @@ public:
    explicit profile( account_name self ) : contract( self ),
                                            _blacklist( self, self ) {}
 
-   /// @abi action
-   void hi( account_name user );
 
    // @abi action
-   void blacklistadd( account_name account );
+   void blacklistadd( account_name account, asset token_min );
 
    // @abi action
    void blacklistrm( account_name account );
@@ -65,7 +65,8 @@ private:
 
    /// @abi table blacklist i64
    struct blacklist_row {
-      account_name account;
+      account_name           account;
+      //std::set<eosio::asset> tokens_blocked;
 
       uint64_t primary_key() const { return account; }
    };
@@ -92,7 +93,7 @@ void apply(uint64_t receiver, uint64_t code, uint64_t action) {
    if (code == self) {
       // Don't rename `thiscontract`, it's being use verbatim in `EOSIO_API` macro
       profile thiscontract(self);
-      switch (action) { EOSIO_API(profile, (hi)(blacklistadd)(blacklistrm)) }
+      switch (action) { EOSIO_API(profile, (blacklistadd)(blacklistrm)) }
 
       eosio_exit(0);
    }
