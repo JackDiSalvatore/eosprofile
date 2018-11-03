@@ -1,4 +1,8 @@
 # eosprofile
+Author: Jack DiSalvatore
+Telegram: @jackdisalvatore
+
+*Note: Use this code is currently untested! Use at your own risk*
 
 Description
 
@@ -20,7 +24,11 @@ cleos get table timmy timmy blacklist
 {
   "rows": [{
       "account": "sammy",
-      "tokens": ["EOS", "ETH", "BTC"]
+      "tokens_block": [
+         "EOS",
+         "ETH",
+         "BTC"
+      ]
     }
   ],
   "more": false
@@ -34,7 +42,7 @@ Blocks an account from sending you less than any specified token.  This can be c
 
 Inputs:
 "name": Account to blacklist
-"amount": Smallest amount of tokens you allow to be sent to you by the sender.  If zero '0.0000' then block all amounts
+"token": Token symbol to block
 
 ex: block all token transfers from "evilman" that are under "5.0000 EOS"
 ```bash

@@ -8,6 +8,8 @@
 
 namespace eosio {
 
+using std::string;
+
 const account_name TOKEN_ACCOUNT = N(eosio.token);
 const account_name TOKEN_ACTION_TRANSFER = N(transfer);
 
@@ -34,7 +36,7 @@ public:
 
 
    // @abi action
-   void blacklistadd( account_name account, asset token_min );
+   void blacklistadd( account_name account, asset token_to_block );
 
    // @abi action
    void blacklistrm( account_name account );
@@ -44,10 +46,16 @@ public:
 
    void cb_transfer() {
       token_transfer action = unpack_action_data<eosio::token_transfer>();
+      print("called back triggered\n");
 
-      auto blacklist_itr = _blacklist.find( action.from );
+      auto blacklistee = _blacklist.find( action.from );
 
-      eosio_assert( blacklist_itr == _blacklist.end(), " sender blacklisted");
+      if ( blacklistee != _blacklist.end() ) {
+         print(eosio::name{action.from}, " is blacklisted\n");
+
+         eosio_assert(false, "sender is blacklisted");
+      }
+      //eosio_assert( blacklistee == _blacklist.end(), " sender blacklisted");
 
       if (action.to == _self && action.quantity.symbol == EOS_SYMBOL) {
          print("You received ", action.quantity, " tokens!");
@@ -58,15 +66,15 @@ public:
    /** NOTIFCATION **/
 
    static bool is_token_transfer(uint64_t code, uint64_t action) {
-      return code == TOKEN_ACCOUNT && action == TOKEN_ACTION_TRANSFER;
+      return /*code == TOKEN_ACCOUNT &&*/ action == TOKEN_ACTION_TRANSFER;
    }
 
 private:
 
    /// @abi table blacklist i64
    struct blacklist_row {
-      account_name           account;
-      //std::set<eosio::asset> tokens_blocked;
+      account_name                  account;
+      std::set<eosio::symbol_name>  tokens_blocked;
 
       uint64_t primary_key() const { return account; }
    };

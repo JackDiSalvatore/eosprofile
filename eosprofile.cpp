@@ -4,17 +4,43 @@
 namespace eosio {
 
 
-   void profile::blacklistadd( account_name account, asset token_min ) {
+   void profile::blacklistadd( account_name account, asset token_to_block ) {
       require_auth( _self );
 
-      print(token_min, "\n");
+      print(token_to_block, "\n");
 
-      eosio_assert( _blacklist.find( account ) == _blacklist.end(),
-                   " account alreaded blacklisted" );
+      auto blacklistee = _blacklist.find( account );
+      // find account in table
+      if ( blacklistee == _blacklist.end() ) {
+         // if no account create new row
+         print("Adding ", eosio::name{ account }, " to blacklist\n");
 
-      // _blacklist.emplace( _self, [&](auto& bl) {
-      //    bl.account = account;
-      // });
+         blacklistee = _blacklist.emplace( _self, [&]( auto& bl ) {
+            print("Blocked ", eosio::name{bl.account} , "\n");
+            bl.account = account;
+         });
+      } else {
+         ;   // account already blacklisted
+      }
+
+      // extract token name, symbol, and percision
+      auto token_to_block_precision = token_to_block.symbol.precision();
+      print("Name: ", token_to_block.symbol.name() ,"\n");
+      print("Symbol: ", token_to_block.symbol, "\n");
+      print("Percision: ", token_to_block_precision, "\n");
+
+      _blacklist.modify( blacklistee, 0, [&]( auto& bl ) {
+         auto existing_token = bl.tokens_blocked.find( token_to_block.symbol.name() );
+
+         if( existing_token == bl.tokens_blocked.end() ) {
+            print("Token Not Found!\nAdding ", token_to_block.symbol, " as ",
+                  token_to_block.symbol.name(), "\n");
+            bl.tokens_blocked.emplace( token_to_block.symbol.name() );
+         } else {
+            print("Token Found! ", *existing_token, " already blacklisted\n");
+         }
+      });
+
    }
 
 
